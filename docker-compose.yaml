@@ -1,0 +1,35 @@
+version: "2.4"
+services:
+  mongodb:
+    image: "mongo:latest"
+    container_name: mongodb
+    hostname: mongodb
+    restart: always
+    # environment:
+    #   MONGO_INITDB_ROOT_USERNAME: root
+    #   MONGO_INITDB_ROOT_PASSWORD: example
+    # ports:
+    #   - 27017:27017
+    networks:
+      - app_internal
+  sample-flask:
+    build:
+      context: .
+    container_name: sample-flask
+    hostname: sample-flask
+    ports:
+      - 5002:5002
+    volumes:
+      - ./app.py:/code/app.py
+    environment:
+      HYPERDX_API_KEY: <YOUR_API_KEY>
+      MONGO_HOST: mongodb
+      # OTEL_EXPORTER_OTLP_ENDPOINT: "http://otel:4318"
+      OTEL_LOG_LEVEL: ERROR
+      OTEL_SERVICE_NAME: sample-flask
+    networks:
+      - app_internal
+    depends_on:
+      - mongodb
+networks:
+  app_internal:
